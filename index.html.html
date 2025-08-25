@@ -1,0 +1,1027 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Sécurisée | Banque SOCIETE GENERALE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- RESET & BASE STYLES --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+
+        /* --- MAIN CONTAINER --- */
+        .login-container {
+            background-color: white;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+            min-height: 500px;
+        }
+
+        /* --- SCREENS (Écrans) --- */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease-in-out;
+            transform: translateX(20px);
+        }
+
+        .screen.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        /* --- SCREEN 1: IDENTIFIANT --- */
+        .screen-identifiant {
+            text-align: center;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 2rem;
+            border-radius: 50%;
+            object-fit: contain;
+        }
+
+        .screen h1 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #d32f2f;
+        }
+
+        .screen p {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            width: 100%;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #d32f2f;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            min-height: 1rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #b71c1c;
+        }
+
+        /* --- SCREEN 2: MOT DE PASSE --- */
+        .screen-password {
+            background-color: white;
+        }
+
+        .password-display {
+            font-size: 1.8rem;
+            letter-spacing: 0.2em;
+            margin: 2rem 0;
+            min-height: 50px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        .key {
+            background-color: #f5f5f5;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+            color: #d32f2f;
+        }
+
+        .key:hover {
+            background-color: #eeeeee;
+        }
+
+        .key:active {
+            background-color: #e0e0e0;
+            transform: scale(0.95);
+        }
+
+        .key.clear {
+            background-color: #ffebee;
+            color: #d32f2f;
+            border-color: #ffcdd2;
+        }
+
+        .key.validate {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+        }
+
+        .key.validate:hover {
+            background-color: #b71c1c;
+        }
+
+        .welcome-message {
+            color: #d32f2f;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        /* --- MESSAGE FEEDBACK --- */
+        .message {
+            margin-top: 1rem;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: 500;
+            text-align: center;
+            width: 100%;
+            display: none;
+        }
+
+        .message.error {
+            background-color: #ffebee;
+            color: #d32f2f;
+            display: block;
+        }
+
+        .message.success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            display: block;
+        }
+
+        /* --- RESPONSIVE DESIGN --- */
+        @media (max-width: 480px) {
+            .screen {
+                padding: 1.8rem;
+            }
+            .logo {
+                width: 80px;
+                height: 80px;
+            }
+        }
+
+        /* --- STYLES FOR COMPTE PAGE --- */
+        :root {
+            --primary: #1a237e;
+            --primary-light: #534bae;
+            --primary-dark: #000051;
+            --secondary: #c62828;
+            --secondary-light: #ff5f52;
+            --secondary-dark: #8e0000;
+            --text: #212121;
+            --text-light: #757575;
+            --background: #f5f7fa;
+            --card: #ffffff;
+            --success: #2e7d32;
+            --warning: #ed6c02;
+            --error: #d32f2f;
+        }
+
+        .compte-container {
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            width: 100%;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .bank-logo {
+            height: 50px;
+            margin-right: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .bank-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Main content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card styling */
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* Account status */
+        .account-status {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 8px 20px rgba(198, 40, 40, 0.3);
+        }
+
+        .status-icon {
+            font-size: 32px;
+            margin-right: 15px;
+        }
+
+        .status-text {
+            font-weight: 500;
+            font-size: 18px;
+        }
+
+        /* Account info */
+        .account-info {
+            grid-column: 1 / -1;
+        }
+
+        .account-holders {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .holder {
+            background: rgba(26, 35, 126, 0.08);
+            padding: 12px 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .holder-icon {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        /* Balance */
+        .balance-container {
+            text-align: center;
+            padding: 20px 0;
+            margin: 30px 0;
+            background: rgba(26, 35, 126, 0.03);
+            border-radius: 12px;
+            border: 1px dashed rgba(26, 35, 126, 0.2);
+        }
+
+        .balance-label {
+            font-size: 18px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .balance-amount {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 1px;
+        }
+
+        .balance-note {
+            margin-top: 15px;
+            color: var(--secondary);
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        /* Transactions */
+        .transaction-list {
+            list-style: none;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 18px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-date {
+            color: var(--text-light);
+            font-size: 15px;
+            min-width: 90px;
+        }
+
+        .transaction-amount {
+            font-weight: 600;
+            min-width: 120px;
+            text-align: right;
+        }
+
+        .debit {
+            color: var(--secondary);
+        }
+
+        .credit {
+            color: var(--success);
+        }
+
+        .transaction-description {
+            flex: 1;
+            margin: 0 15px;
+            color: var(--text);
+        }
+
+        /* Credit Card */
+        .credit-card {
+            background: linear-gradient(135deg, #303f9f 0%, #1a237e 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-chip {
+            width: 50px;
+            height: 40px;
+            background: linear-gradient(135deg, #ffd54f 0%, #ffc107 100%);
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .card-number {
+            font-size: 22px;
+            letter-spacing: 3px;
+            margin-bottom: 25px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .card-details {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .card-holder, .card-expiry {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .card-value {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .card-logo {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            font-size: 32px;
+        }
+
+        .card-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--secondary);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Actions */
+        .actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 15px;
+        }
+
+        .btn-compte {
+            padding: 16px 32px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-logout {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 5px 15px rgba(26, 35, 126, 0.3);
+        }
+
+        .btn-logout:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(26, 35, 126, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: var(--text);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-icon {
+            margin-right: 10px;
+        }
+
+        /* Footer */
+        .footer {
+            width: 100%;
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 40px;
+            color: var(--text-light);
+            font-size: 14px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .contact {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .contact-icon {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+
+        /* Decorative elements */
+        .decoration {
+            position: absolute;
+            opacity: 0.03;
+            font-size: 200px;
+            z-index: 0;
+        }
+
+        .decoration-1 {
+            top: -50px;
+            right: -30px;
+            color: var(--primary);
+        }
+
+        .decoration-2 {
+            bottom: -60px;
+            left: -30px;
+            color: var(--secondary);
+        }
+
+        /* Security badge */
+        .security-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .badge-icon {
+            margin-right: 6px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ÉCRAN DE CONNEXION -->
+    <main class="login-container" id="loginContainer">
+        <!-- ÉCRAN 1: SAISIE DE L'IDENTIFIANT -->
+        <section class="screen screen-identifiant active" id="screenIdentifiant">
+            <img src="data:image/png;base64,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" alt="Logo" class="logo">
+            <h1>Connexion</h1>
+            <p>Veuillez saisir votre identifiant</p>
+
+            <div class="input-group">
+                <label for="username">Identifiant</label>
+                <input type="text" id="username" placeholder="Votre identifiant" required>
+                <div class="error-message" id="usernameError"></div>
+            </div>
+
+            <button class="btn" id="btnContinue">Continuer</button>
+        </section>
+
+        <!-- ÉCRAN 2: SAISIE DU MOT DE PASSE -->
+        <section class="screen screen-password" id="screenPassword">
+            <div class="welcome-message" id="welcomeMessage">Bonjour, </div>
+            <h2>Code confidentiel</h2>
+            <p>Saisissez votre code à 6 chiffres</p>
+
+            <div class="password-display" id="passwordDisplay"></div>
+
+            <div class="keypad">
+                <div class="key" data-key="1">1</div>
+                <div class="key" data-key="2">2</div>
+                <div class="key" data-key="3">3</div>
+                <div class="key" data-key="4">4</div>
+                <div class="key" data-key="5">5</div>
+                <div class="key" data-key="6">6</div>
+                <div class="key" data-key="7">7</div>
+                <div class="key" data-key="8">8</div>
+                <div class="key" data-key="9">9</div>
+                <div class="key clear" data-action="clear">C</div>
+                <div class="key" data-key="0">0</div>
+                <div class="key validate" data-action="validate">OK</div>
+            </div>
+
+            <div class="message" id="message"></div>
+        </section>
+    </main>
+
+    <!-- ÉCRAN DU COMPTE (masqué initialement) -->
+    <div class="compte-container" id="compteContainer">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-container">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8m_Fu7ip-MOBKofC61b-UoVpj8jamkjpWdg&s" alt="Logo Banque" class="bank-logo">
+                <div class="bank-name"></div>
+            </div>
+            <div class="user">Bienvenue, M. Dujardin</div>
+        </div>
+        
+        <!-- Account Status -->
+        <div class="account-status">
+            <i class="fas fa-ban status-icon"></i>
+            <div class="status-text">COMPTE BLOQUÉ - Opérations restreintes jusqu'à régularisation</div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Account Information -->
+            <div class="card account-info">
+                <div class="security-badge">
+                    <i class="fas fa-lock badge-icon"></i> Sécurisé
+                </div>
+                <div class="card-header">
+                    <h2 class="card-title">Informations du Compte</h2>
+                    <i class="fas fa-info-circle" style="color: var(--primary); font-size: 20px;"></i>
+                </div>
+                
+                <div class="account-holders">
+                    <div class="holder">
+                        <i class="fas fa-user-tie holder-icon"></i>
+                        Mr. Michel Dujardin
+                    </div>
+                    <div class="holder">
+                        <i class="fas fa-user holder-icon"></i>
+                        Mr. Jacques Dujardin
+                    </div>
+                </div>
+                
+                <div class="balance-container">
+                    <div class="balance-label">Solde actuel</div>
+                    <div class="balance-amount">1 875 098,42 €</div>
+                    <div class="balance-note">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Compte bloqué - Retraits et virements suspendus
+                    </div>
+                </div>
+                
+                <div class="account-details">
+                    <div class="detail-item">
+                        <strong>Numéro de compte:</strong> FR76 1254 8026 9012 3456 7890 130
+                    </div>
+                    <div class="detail-item">
+                        <strong>IBAN:</strong> FR76 1254 8026 9012 3456 7890 130
+                    </div>
+                    <div class="detail-item">
+                        <strong>Date d'ouverture:</strong> 12/04/2002
+                    </div>
+                    <div class="detail-item">
+                        <strong>Type de compte:</strong> Compte Premium
+                    </div>
+                </div>
+                
+                <!-- Credit Card -->
+                <div class="credit-card">
+                    <div class="card-status">BLOQUÉE</div>
+                    <div class="card-chip"></div>
+                    <div class="card-number">4921 **** **** 3742</div>
+                    <div class="card-details">
+                        <div class="card-holder">
+                            <span class="card-label">TITULAIRE</span>
+                            <span class="card-value">M. DUJARDIN</span>
+                        </div>
+                        <div class="card-expiry">
+                            <span class="card-label">EXPIRE</span>
+                            <span class="card-value">09/26</span>
+                        </div>
+                    </div>
+                    <div class="card-logo">
+                        <i class="fab fa-cc-visa"></i>
+                    </div>
+                </div>
+                
+                <i class="fas fa-shield-alt decoration decoration-1"></i>
+                <i class="fas fa-euro-sign decoration decoration-2"></i>
+            </div>
+            
+            <!-- Recent Transactions -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Dernières transactions</h2>
+                    <i class="fas fa-history" style="color: var(--primary); font-size: 20px;"></i>
+                </div>
+                
+                <ul class="transaction-list">
+                    <li class="transaction-item">
+                        <span class="transaction-date">15 mai 2008</span>
+                        <span class="transaction-description">Fournisseur conteneur</span>
+                        <span class="transaction-amount debit">-5 880,00 €</span>
+                    </li>
+                    <li class="transaction-item">
+                        <span class="transaction-date">8 mai 2008</span>
+                        <span class="transaction-description">Douane</span>
+                        <span class="transaction-amount debit">-19 045,00 €</span>
+                    </li>
+                    <li class="transaction-item">
+                        <span class="transaction-date">5 mai 2008</span>
+                        <span class="transaction-description">Alain Munier Comptable</span>
+                        <span class="transaction-amount credit">+24 520,00 €</span>
+                    </li>
+                    <li class="transaction-item">
+                        <span class="transaction-date">2 mai 2008</span>
+                        <span class="transaction-description">Nouveau véhicule</span>
+                        <span class="transaction-amount debit">-8 250,00 €</span>
+                    </li>
+                </ul>
+                
+                <div style="margin-top: 20px; text-align: center;">
+                    <a href="#" class="btn-compte btn-secondary">
+                        <i class="fas fa-download btn-icon"></i>
+                        Télécharger le relevé
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Logout Button -->
+        <div class="actions">
+            <a href="#" id="btnLogout" class="btn-compte btn-logout">
+                <i class="fas fa-sign-out-alt btn-icon"></i>
+                Déconnexion
+            </a>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2025 Banque Societe generale - Tous droits réservés. Agrément AMF n° 123456</p>
+            <div class="contact">
+                <div class="contact-item">
+                    <i class="fas fa-phone contact-icon"></i>
+                   09 70 80 90 60
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-envelope contact-icon"></i>
+                    contact@banque-societegenerale.fr
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-shield-alt contact-icon"></i>
+                    Sécurité des transactions
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Éléments du DOM
+            const loginContainer = document.getElementById('loginContainer');
+            const compteContainer = document.getElementById('compteContainer');
+            const screenIdentifiant = document.getElementById('screenIdentifiant');
+            const screenPassword = document.getElementById('screenPassword');
+            const usernameInput = document.getElementById('username');
+            const usernameError = document.getElementById('usernameError');
+            const btnContinue = document.getElementById('btnContinue');
+            const welcomeMessage = document.getElementById('welcomeMessage');
+            const passwordDisplay = document.getElementById('passwordDisplay');
+            const messageDiv = document.getElementById('message');
+            const allKeys = document.querySelectorAll('.key');
+            const btnLogout = document.getElementById('btnLogout');
+
+            // Identifiants prédéfinis
+            const CORRECT_USERNAME = "9157369105";
+            const CORRECT_PASSWORD = "641250";
+
+            // Variables d'état
+            let username = '';
+            let password = '';
+            const requiredPasswordLength = 6;
+
+            // 1. Gestion de la continuation vers le mot de passe
+            btnContinue.addEventListener('click', function() {
+                username = usernameInput.value.trim();
+                
+                if (username === '') {
+                    usernameError.textContent = "Veuillez saisir votre identifiant.";
+                    usernameInput.focus();
+                } else if (username !== CORRECT_USERNAME) {
+                    usernameError.textContent = "Identifiant incorrect.";
+                    usernameInput.focus();
+                } else {
+                    usernameError.textContent = "";
+                    // Mettre à jour le message de bienvenue
+                    welcomeMessage.textContent = "Bonjour, " + username;
+                    
+                    // Cacher l'écran identifiant et afficher l'écran mot de passe
+                    screenIdentifiant.classList.remove('active');
+                    setTimeout(() => {
+                        screenPassword.classList.add('active');
+                    }, 300);
+                }
+            });
+
+            // 2. Gestion de la touche Entrée sur le champ identifiant
+            usernameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    btnContinue.click();
+                }
+            });
+
+            // 3. Gestion du clavier numérique
+            allKeys.forEach(key => {
+                key.addEventListener('click', handleKeyPress);
+            });
+
+            function handleKeyPress(event) {
+                const action = this.getAttribute('data-action');
+                const keyValue = this.getAttribute('data-key');
+
+                // Effacer le message précédent
+                messageDiv.className = 'message';
+                messageDiv.textContent = '';
+
+                if (action === 'clear') {
+                    // Action EFFACER (C)
+                    password = '';
+                    updatePasswordDisplay();
+                } else if (action === 'validate') {
+                    // Action VALIDER (OK)
+                    validateLogin();
+                } else if (keyValue && password.length < requiredPasswordLength) {
+                    // Saisie d'un chiffre
+                    password += keyValue;
+                    updatePasswordDisplay();
+                    
+                    // Validation automatique si le code est complet
+                    if (password.length === requiredPasswordLength) {
+                        setTimeout(validateLogin, 200);
+                    }
+                }
+            }
+
+            function updatePasswordDisplay() {
+                // Affiche des points pour chaque chiffre saisi
+                let display = '';
+                for (let i = 0; i < password.length; i++) {
+                    display += '• ';
+                }
+                // Ajoute des espaces pour les chiffres manquants (pour garder la même largeur)
+                for (let i = password.length; i < requiredPasswordLength; i++) {
+                    display += '_ ';
+                }
+                passwordDisplay.textContent = display;
+            }
+
+            // 4. Validation finale de la connexion
+            function validateLogin() {
+                if (password.length < requiredPasswordLength) {
+                    messageDiv.textContent = `Veuillez saisir les ${requiredPasswordLength} chiffres.`;
+                    messageDiv.classList.add('error');
+                    return;
+                }
+
+                if (password !== CORRECT_PASSWORD) {
+                    messageDiv.textContent = "Code incorrect. Veuillez réessayer.";
+                    messageDiv.classList.add('error');
+                    password = '';
+                    updatePasswordDisplay();
+                    return;
+                }
+
+                // CONNEXION RÉUSSIE
+                messageDiv.textContent = "Connexion réussie! Redirection...";
+                messageDiv.classList.add('success');
+
+                // Redirection vers la page de compte après 1.5 secondes
+                setTimeout(() => {
+                    loginContainer.style.display = 'none';
+                    compteContainer.style.display = 'block';
+                    document.body.style.background = 'linear-gradient(135deg, var(--background) 0%, #e0e0e0 100%)';
+                }, 1500);
+            }
+
+            // 5. Saisie au clavier physique
+            document.addEventListener('keydown', function(event) {
+                // Only capture keys if password screen is active
+                if (screenPassword.classList.contains('active')) {
+                    if (event.key >= '0' && event.key <= '9' && password.length < requiredPasswordLength) {
+                        password += event.key;
+                        updatePasswordDisplay();
+                        if (password.length === requiredPasswordLength) {
+                            setTimeout(validateLogin, 200);
+                        }
+                    } else if (event.key === 'Backspace') {
+                        password = password.slice(0, -1);
+                        updatePasswordDisplay();
+                    } else if (event.key === 'Enter') {
+                        validateLogin();
+                    }
+                }
+            });
+
+            // Gestion de la déconnexion
+            btnLogout.addEventListener('click', function(e) {
+                e.preventDefault();
+                compteContainer.style.display = 'none';
+                loginContainer.style.display = 'block';
+                document.body.style.background = 'linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%)';
+                
+                // Réinitialiser les champs
+                usernameInput.value = '';
+                password = '';
+                updatePasswordDisplay();
+                screenPassword.classList.remove('active');
+                screenIdentifiant.classList.add('active');
+                usernameInput.focus();
+            });
+
+            // Focus initial sur le champ identifiant
+            usernameInput.focus();
+
+            // Animation pour les éléments du compte
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.animation = `fadeIn 0.5s ease forwards ${index * 0.2}s`;
+            });
+            
+            // Ajouter le style pour l'animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>
